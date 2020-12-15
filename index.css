@@ -1,0 +1,91 @@
+:root {
+  /* %icon-base var */
+  --icon-color:currentColor;
+  --icon-size:var(--icon-size-normal);
+  --icon-size-small:18px;
+  --icon-size-normal:24px;
+  --icon-size-medium:36px;
+  --icon-size-large:48px;
+}
+
+span.icon, div.icon {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/*
+    credit:
+    Forked from @jossef/material-design-icons-iconfont 
+*/
+@font-face {
+  /* icon-font */
+  font-family: "Material Icons";
+  font-style: normal;
+  font-weight: 400;
+  src: url("./fonts/MaterialIcons-Regular.woff2") format("woff2"), url("./fonts/MaterialIcons-Regular.woff") format("woff"), url("./fonts/MaterialIcons-Regular.ttf") format("truetype");
+}
+/* begin: basic (--) style */
+span.icon, div.icon {
+  /* icon-font */
+  font-size: var(--icon-size);
+  color: var(--icon-color);
+  font-family: "Material Icons";
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "liga";
+}
+
+/* end: basic (--) style */
+:root {
+  /* %icon-img var */
+  --icon-img:linear-gradient(transparent, transparent);
+  --icon-img-ratio: 1;
+}
+
+/* begin: item-specific (-specific) style */
+span.document.icon.img, div.document.icon.img {
+  --icon-img:url("./icons/document.svg");
+}
+
+span.form.icon.img, div.form.icon.img {
+  --icon-img:url("./icons/form.svg");
+}
+
+span.instagram.icon.img, div.instagram.icon.img {
+  --icon-img:url("./icons/instagram.svg");
+}
+
+span.whatsapp.icon.img, div.whatsapp.icon.img {
+  --icon-img:url("./icons/whatsapp.svg");
+}
+
+/* end: item-specific (-specific) style */
+/* begin: item-any (-) style */
+/* end: item-any (-) style */
+/* begin: basic (--) style */
+span.icon.img, div.icon.img {
+  height: var(--icon-size);
+  width: calc(var(--icon-size) * var(--icon-img-ratio));
+  background-color: var(--icon-color);
+  mask-image: var(--icon-img);
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-image: var(--icon-img);
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+
+/* end: basic (--) style */
+/* begin: basic (--) style */
+/* end: basic (--) style */

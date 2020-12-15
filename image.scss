@@ -1,0 +1,112 @@
+// Provides a common icon set for html page using "image based icon".
+
+
+
+@use "base" as base;
+
+@use "sass:string";
+@use "sass:map";
+
+// development:
+@use "node_modules/@heymarco/scss-utils/index" as *;
+
+// production:
+// @use "../../../node_modules/@heymarco/scss-utils/index" as *;
+
+
+
+$alias          : "%icon-img"                               !default;
+$class          : ".img"                                    !default;
+$var-root       : base.$var-root                            !default;
+$var-prefix     : "img"                                     !default;
+$var-prefix: part-combine(base.$var-prefix, $var-prefix);
+$cssvar: cssvar($var-prefix);
+
+// development:
+$path           : "./icons/"                                !default;
+
+// production:
+// $path           : "./node_modules/@heymarco/icon/icons/"    !default;
+
+$files          : (
+ /* filename    | ratio */
+    document    : 1.00,
+    form        : 1.00,
+    instagram   : 1.00,
+    whatsapp    : 1.00,
+)                                                           !default;
+$ext            : svg                                       !default;
+$ratio-default  : 1                                         !default;
+
+
+
+@if (str-not-empty($var-root)) { @include selector($var-root) {
+    /* #{$alias} var */
+
+    #{string.slice($cssvar, 1, -2)} : linear-gradient(transparent, transparent); // literally no image
+    #{$cssvar}ratio                 : $ratio-default;
+}}
+
+
+
+/* begin: item-specific (-specific) style */
+@mixin style-of($file) {
+    @if (not map.has-key($files, $file)) { @error "#{$file} is not found."; }
+    
+    #{string.slice($cssvar, 1, -2)} : url("#{$path}#{$file}.#{$ext}");
+
+    $ratio: map.get($files, $file);
+    @if (($ratio < $ratio-default) or ($ratio > $ratio-default)) { #{$cssvar}ratio: $ratio; }
+}
+@each $file, $ratio in $files {
+    #{$alias}-#{$file}  { @include style-of($file); }
+}
+/* end: item-specific (-specific) style */
+
+
+/* begin: item-any (-) style */
+@mixin style-any {
+    @each $file, $ratio in $files { @include selector("&.#{$file}") {
+        @include style-of($file);   // import item-specific style
+    }}
+}
+#{$alias}- {
+    @each $file, $ratio in $files { @include selector("&.#{$file}") {
+        @extend #{$alias}-#{$file}; // import item-specific style
+    }}
+}
+/* end: item-any (-) style */
+
+
+
+/* begin: basic (--) style */
+@mixin style-basic {
+    height                  :      var(#{base.$cssvar}size);
+    width                   : calc(var(#{base.$cssvar}size) * var(#{$cssvar}ratio));
+    
+    background-color        : var(#{base.$cssvar}color);
+    
+    
+    mask-image              : var(#{string.slice($cssvar, 1, -2)});
+    mask-size               : contain;
+    mask-repeat             : no-repeat;
+    mask-position           : center;
+    
+    -webkit-mask-image      : var(#{string.slice($cssvar, 1, -2)});
+    -webkit-mask-size       : contain;
+    -webkit-mask-repeat     : no-repeat;
+    -webkit-mask-position   : center;
+}
+#{$alias}-- { @include style-basic; }
+/* end: basic (--) style */
+
+@mixin style {
+    @include style-basic;   // import basic (--) style
+
+    @include style-any;     // import item-any (-) style
+}
+@include declare-alias-base-class($alias, base.$class, $class) {
+    @extend #{$alias}--;    // import basic (--) style
+
+    @extend #{$alias}-;     // import item-any (-) style
+}

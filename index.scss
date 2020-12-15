@@ -1,0 +1,62 @@
+// development:
+@use "node_modules/@heymarco/scss-utils/index" as *;
+
+// production:
+// @use "../../../node_modules/@heymarco/scss-utils/index" as *;
+
+
+
+@forward "base" hide $alias, style;
+@use "base" as base;
+
+@forward "font"     as font-*;
+@use "font" as font;
+
+@forward "image"    as img-*;
+@use "image" as img;
+
+
+
+$alias          : "%icon"                                   !default;
+
+
+
+/* begin: basic (--) style */
+@mixin style-basic {
+    @include base.style;
+
+    @include selector-combine("", font.$class) {
+        @include font.style-basic;
+    }
+
+    @include selector-combine("", img.$class) {
+        @include img.style-basic;
+    }
+}
+#{$alias}-- {
+    @extend #{base.$alias};
+
+    @extend #{font.$alias}--;
+
+    @extend #{img.$alias}--;
+}
+/* end: basic (--) style */
+
+@mixin style() {
+    @include base.style;
+
+    @include selector-combine("", font.$class) {
+        @include font.style;
+    }
+
+    @include selector-combine("", img.$class) {
+        @include img.style;
+    }
+}
+#{$alias} {
+    @extend #{base.$alias};
+
+    @extend #{font.$alias};
+
+    @extend #{img.$alias};
+}

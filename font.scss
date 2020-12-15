@@ -1,0 +1,121 @@
+// Provides a common icon set for html page using "font based icon" (Google's Material Icons -or- Font Awesome).
+
+/*
+    credit:
+    Forked from @jossef/material-design-icons-iconfont 
+*/
+
+
+
+@use "base" as base;
+
+@use "sass:string";
+
+// development:
+@use "node_modules/@heymarco/scss-utils/index" as *;
+
+// production:
+// @use "../../../node_modules/@heymarco/scss-utils/index" as *;
+
+
+
+$alias          : "%icon-font"                              !default;
+$class          : ""                                        !default;
+$var-root       : base.$var-root                            !default;
+$var-prefix     : "font"                                    !default;
+$var-prefix: part-combine(base.$var-prefix, $var-prefix);
+$cssvar: cssvar($var-prefix);
+
+// development:
+$path           : "./fonts/"                                !default;
+
+// production:
+// $path           : "./node_modules/@heymarco/icon/fonts/"    !default;
+
+$files          : (
+    "MaterialIcons-Regular.woff2",
+    "MaterialIcons-Regular.woff",
+    "MaterialIcons-Regular.ttf",
+)                                                           !default;
+$family         : "Material Icons"                          !default;
+$style          : normal                                    !default;
+$weight         : 400                                       !default;
+
+
+
+@function format($file) {
+    $dot: string.index($file, ".");
+    @if ($dot == null) { @return ""; }
+
+    $ext: string.slice($file, $dot + 1);
+    $ext: string.to-lower-case($ext);
+    @if ($ext == "ttf") { @return "truetype"; }
+    @return $ext;
+}
+
+@function src() {
+    $list: "";
+    @each $file in $files {
+        $list: $list + "url(\"#{$path}#{$file}\") format(\"#{format($file)}\"), "
+    }
+
+    // replace the last " ,"
+    $list: string.slice($list, 1, -3);
+
+    @return string.unquote($list);
+}
+
+
+
+@font-face {
+    /* icon-font */
+
+    font-family     : $family;
+    font-style      : $style;
+    font-weight     : $weight;
+    src             : src();
+}
+
+
+
+/* begin: basic (--) style */
+@mixin style-basic {
+    /* icon-font */
+
+    font-size       : var(#{base.$cssvar}size);
+
+    color           : var(#{base.$cssvar}color);
+
+
+    font-family     : $family;
+    font-style      : $style;
+    font-weight     : $weight;
+
+    line-height     : 1;
+    text-transform  : none;
+    letter-spacing  : normal;
+    word-wrap       : normal;
+    white-space     : nowrap;
+    direction       : ltr;
+
+    // support for all WebKit browsers
+    -webkit-font-smoothing: antialiased;
+
+    // support for Safari and Chrome
+    text-rendering: optimizeLegibility;
+
+    // support for Firefox
+    -moz-osx-font-smoothing: grayscale;
+
+    // support for IE
+    font-feature-settings: 'liga';
+}
+#{$alias}-- { @include style-basic; }
+/* end: basic (--) style */
+
+@mixin style {
+    @include style-basic;   // import basic (--) style
+}
+@include declare-alias-base-class($alias, base.$class, $class) {
+    @extend #{$alias}--;    // import basic (--) style
+}
