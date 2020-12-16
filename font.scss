@@ -1,36 +1,28 @@
 // Provides a common icon set for html page using "font based icon" (Google's Material Icons -or- Font Awesome).
 
-/*
-    credit:
-    Forked from @jossef/material-design-icons-iconfont 
-*/
 
 
+@use "dependencies" as *;
+@use "sass:string" as string;
+@use "sass:map" as map;
 
 @use "base" as base;
-
-@use "sass:string";
-
-// development:
-@use "node_modules/@heymarco/scss-utils/index" as *;
-
-// production:
-// @use "../../../node_modules/@heymarco/scss-utils/index" as *;
+@use "font-material-codepoints" as material;
 
 
 
 $alias          : "%icon-font"                              !default;
-$class          : ""                                        !default;
+/*sub*/$class   : ""                                        !default;
 $var-root       : base.$var-root                            !default;
 $var-prefix     : "font"                                    !default;
 $var-prefix: part-combine(base.$var-prefix, $var-prefix);
 $cssvar: cssvar($var-prefix);
 
 // development:
-$path           : "./fonts/"                                !default;
+// $path           : "./fonts/"                                !default;
 
 // production:
-// $path           : "./node_modules/@heymarco/icon/fonts/"    !default;
+$path           : "./node_modules/@heymarco/icon/fonts/"    !default;
 
 $files          : (
     "MaterialIcons-Regular.woff2",
@@ -40,6 +32,8 @@ $files          : (
 $family         : "Material Icons"                          !default;
 $style          : normal                                    !default;
 $weight         : 400                                       !default;
+
+$contents     : material.$contents                          !default;
 
 
 
@@ -75,6 +69,46 @@ $weight         : 400                                       !default;
     font-weight     : $weight;
     src             : src();
 }
+
+@if (str-not-empty($var-root)) { @include selector($var-root) {
+    /* #{$alias} var */
+
+    #{$cssvar}content   : "";
+}}
+
+
+
+/* begin: item-specific (-specific) style */
+@mixin style-of($name) {
+    @if (not map.has-key($contents, $name)) { @error "#{$name} is not found."; }
+    
+    $content: map.get($contents, $name);
+    #{$cssvar}content   : $content;
+}
+@each $name, $content in $contents {
+    #{$alias}-#{$name}  { @include style-of($name); }
+}
+/* end: item-specific (-specific) style */
+
+
+/* begin: item-any (-) style */
+@function normalize-class($name) {
+    $first-char: string.slice($name, 0, 1);
+    @if (string.index("0123456789", $first-char)) { $name: "_" + $name; }
+
+    @return $name;
+}
+@mixin style-any {
+    @each $name, $content in $contents { @include selector("&.#{normalize-class($name)}") {
+        @include style-of($name);   // import item-specific style
+    }}
+}
+#{$alias}- {
+    @each $name, $content in $contents { @include selector("&.#{normalize-class($name)}") {
+        @extend #{$alias}-#{$name}; // import item-specific style
+    }}
+}
+/* end: item-any (-) style */
 
 
 
@@ -115,7 +149,11 @@ $weight         : 400                                       !default;
 
 @mixin style {
     @include style-basic;   // import basic (--) style
+
+    @include style-any;     // import item-any (-) style
 }
 @include declare-alias-base-class($alias, base.$class, $class) {
     @extend #{$alias}--;    // import basic (--) style
+
+    @extend #{$alias}-;     // import item-any (-) style
 }

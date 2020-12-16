@@ -1,12 +1,11 @@
-// development:
-@use "node_modules/@heymarco/scss-utils/index" as *;
-
-// production:
-// @use "../../../node_modules/@heymarco/scss-utils/index" as *;
+// Provides a common icon set for html page using "font based icon" (Google's Material Icons -or- Font Awesome)
+// and fallback using "image based icon".
 
 
 
-@forward "base" hide $alias, style;
+@use "dependencies" as *;
+
+@forward "base" hide $alias, style, style-basic;
 @use "base" as base;
 
 @forward "font"     as font-*;
@@ -56,7 +55,11 @@ $alias          : "%icon"                                   !default;
 #{$alias} {
     @extend #{base.$alias};
 
-    @extend #{font.$alias};
+    @include selector-combine("", font.$class) {
+        @extend #{font.$alias};
+    }
 
-    @extend #{img.$alias};
+    @include selector-combine("", img.$class) {
+        @extend #{img.$alias};
+    }
 }

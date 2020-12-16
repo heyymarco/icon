@@ -2,31 +2,26 @@
 
 
 
+@use "dependencies" as *;
+@use "sass:string" as string;
+@use "sass:map" as map;
+
 @use "base" as base;
-
-@use "sass:string";
-@use "sass:map";
-
-// development:
-@use "node_modules/@heymarco/scss-utils/index" as *;
-
-// production:
-// @use "../../../node_modules/@heymarco/scss-utils/index" as *;
 
 
 
 $alias          : "%icon-img"                               !default;
-$class          : ".img"                                    !default;
+/*sub*/$class   : ".img"                                    !default;
 $var-root       : base.$var-root                            !default;
 $var-prefix     : "img"                                     !default;
 $var-prefix: part-combine(base.$var-prefix, $var-prefix);
 $cssvar: cssvar($var-prefix);
 
 // development:
-$path           : "./icons/"                                !default;
+// $path           : "./icons/"                                !default;
 
 // production:
-// $path           : "./node_modules/@heymarco/icon/icons/"    !default;
+$path           : "./node_modules/@heymarco/icon/icons/"    !default;
 
 $files          : (
  /* filename    | ratio */

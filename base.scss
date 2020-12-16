@@ -2,16 +2,12 @@
 
 
 
-// development:
-@use "node_modules/@heymarco/scss-utils/index" as *;
-
-// production:
-// @use "../../../node_modules/@heymarco/scss-utils/index" as *;
+@use "dependencies" as *;
 
 
 
 $alias          : "%icon-base"                              !default;
-$class          : "span.icon, div.icon"                     !default;
+$class          : "span.icon"                               !default;
 $var-root       : ":root"                                   !default;
 $var-prefix     : "icon"                                    !default;
 $cssvar: cssvar($var-prefix);
