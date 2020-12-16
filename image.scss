@@ -10,7 +10,7 @@
 
 
 
-$alias          : "%icon-img"                               !default;
+$alias          : "%icon-image"                             !default;
 /*sub*/$class   : ".img"                                    !default;
 $var-root       : base.$var-root                            !default;
 $var-prefix     : "img"                                     !default;
@@ -39,6 +39,7 @@ $ratio-default  : 1                                         !default;
     /* #{$alias} var */
 
     #{string.slice($cssvar, 1, -2)} : linear-gradient(transparent, transparent); // literally no image
+    // #{$cssvar}path                  : $path;
     #{$cssvar}ratio                 : $ratio-default;
 }}
 

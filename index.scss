@@ -1,5 +1,5 @@
-// Provides a common icon set for html page using "font based icon" (Google's Material Icons -or- Font Awesome)
-// and fallback using "image based icon".
+// Provides a common icon set for html page using "image based icon"
+// and fallback using "font based icon" (Google's Material Icons -or- Font Awesome).
 
 
 
@@ -33,11 +33,15 @@ $alias          : "%icon"                                   !default;
     }
 }
 #{$alias}-- {
-    @extend #{base.$alias};
+    @extend #{base.$alias} !optional;
 
-    @extend #{font.$alias}--;
+    @include selector-combine("", font.$class) {
+        @extend #{font.$alias}-- !optional;
+    }
 
-    @extend #{img.$alias}--;
+    @include selector-combine("", img.$class) {
+        @extend #{img.$alias}-- !optional;
+    }
 }
 /* end: basic (--) style */
 
@@ -53,13 +57,13 @@ $alias          : "%icon"                                   !default;
     }
 }
 #{$alias} {
-    @extend #{base.$alias};
+    @extend #{base.$alias} !optional;
 
     @include selector-combine("", font.$class) {
-        @extend #{font.$alias};
+        @extend #{font.$alias} !optional;
     }
 
     @include selector-combine("", img.$class) {
-        @extend #{img.$alias};
+        @extend #{img.$alias} !optional;
     }
 }
