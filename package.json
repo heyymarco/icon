@@ -1,8 +1,7 @@
 {
   "name": "@heymarco/icon",
   "version": "1.0.0",
-  "description": "Provides a common icon set for html page.",
-  "main": "index.js",
+  "description": "Provides a common icon set for html page using \"font based icon\" (Google's Material Icons -or- Font Awesome) and fallback using \"image based icon\".",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -14,7 +13,10 @@
     "icon",
     "graphic",
     "image",
-    "svg"
+    "svg",
+    "font",
+    "font awesome",
+    "google materials"
   ],
   "author": "HeyMarco",
   "license": "ISC",
