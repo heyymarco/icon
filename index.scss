@@ -4,19 +4,177 @@
 
 
 @use "dependencies" as *;
+@use "sass:list" as list;
+@use "sass:map" as map;
 
-@forward "base" hide $alias, style, style-basic;
+@forward "base" hide $alias, style, style-basic, style-any, style-of;
 @use "base" as base;
-
-@forward "font"     as font-*;
-@use "font" as font;
 
 @forward "image"    as img-*;
 @use "image" as img;
 
+@forward "font"     as font-*;
+@use "font" as font;
+
 
 
 $alias          : "%icon"                                   !default;
+$default        : "img"                                     !default;
+@if (list.index(("img", "font", "", null), $default) == null) { @error "$default must be \"img\" or \"font\" or \"\" or null"; }
+
+
+
+/* begin: item-specific (-specific) style */
+$items-n: ();
+@if (str-not-empty($default)) {
+    @if ($default == "img") {
+        $items-n: map.merge(img.$items-n, $items-n);
+        $items-n: map.merge(font.$items-n, $items-n);
+    }
+    @else if ($default == "font") {
+        $items-n: map.merge(font.$items-n, $items-n);
+        $items-n: map.merge(img.$items-n, $items-n);
+    }
+}
+
+@mixin style-of($item) {
+    $item-n: normalize-class($item);
+    @if ($default == "img") {
+        @if (map.has-key(img.$items-n, $item-n)) {
+            &:not(#{font.$class}) {
+                @include img.style-basic;
+                @include img.style-of($item-n);
+            }
+
+            @if (map.has-key(font.$items-n, $item-n)) { &#{font.$class} {
+                @include font.style-of($item-n);
+            }}
+        }
+        @else if (map.has-key(font.$items-n, $item-n)) {
+            &:not(#{img.$class}) {
+                @include font.style-basic;
+                @include font.style-of($item-n);
+            }
+
+            @if (map.has-key(img.$items-n, $item-n)) { &#{img.$class} {
+                @include img.style-of($item-n);
+            }}
+        }
+        @else {
+            @error "#{$item} is not found.";
+        }
+    }
+    @else if ($default == "font") {
+        @if (map.has-key(font.$items-n, $item-n)) {
+            &:not(#{img.$class}) {
+                @include font.style-basic;
+                @include font.style-of($item-n);
+            }
+
+            @if (map.has-key(img.$items-n, $item-n)) { &#{img.$class} {
+                @include img.style-of($item-n);
+            }}
+        }
+        @else if (map.has-key(img.$items-n, $item-n)) {
+            &:not(#{font.$class}) {
+                @include img.style-basic;
+                @include img.style-of($item-n);
+            }
+
+            @if (map.has-key(font.$items-n, $item-n)) { &#{font.$class} {
+                @include font.style-of($item-n);
+            }}
+        }
+        @else {
+            @error "#{$item} is not found.";
+        }
+    }
+}
+
+@if ($default == "img") { @each $item-n, $content in $items-n {
+    #{$alias}-#{$item-n} {
+        @if (map.has-key(img.$items-n, $item-n)) {
+            &:not(#{font.$class}) {
+                @extend #{img.$alias}--             !optional;
+                @extend #{img.$alias}-#{$item-n}    !optional;
+            }
+
+            @if (map.has-key(font.$items-n, $item-n)) { &#{font.$class} {
+                @extend #{font.$alias}-#{$item-n}   !optional;
+            }}
+        }
+        @else if (map.has-key(font.$items-n, $item-n)) {
+            &:not(#{img.$class}) {
+                @extend #{font.$alias}--            !optional;
+                @extend #{font.$alias}-#{$item-n}   !optional;
+            }
+
+            @if (map.has-key(img.$items-n, $item-n)) { &#{img.$class} {
+                @extend #{img.$alias}-#{$item-n}    !optional;
+            }}
+        }
+    }
+}}
+@else if ($default == "font") { @each $item-n, $content in $items-n {
+    #{$alias}-#{$item-n} {
+        @if (map.has-key(font.$items-n, $item-n)) {
+            &:not(#{img.$class}) {
+                @extend #{font.$alias}--            !optional;
+                @extend #{font.$alias}-#{$item-n}   !optional;
+            }
+
+            @if (map.has-key(img.$items-n, $item-n)) { &#{img.$class} {
+                @extend #{img.$alias}-#{$item-n}    !optional;
+            }}
+        }
+        @else if (map.has-key(img.$items-n, $item-n)) {
+            &:not(#{font.$class}) {
+                @extend #{img.$alias}--             !optional;
+                @extend #{img.$alias}-#{$item-n}    !optional;
+            }
+
+            @if (map.has-key(font.$items-n, $item-n)) { &#{font.$class} {
+                @extend #{font.$alias}-#{$item-n}   !optional;
+            }}
+        }
+    }
+}}
+/* end: item-specific (-specific) style */
+
+/* begin: item-any (-) style */
+@mixin style-any {
+    @if (str-not-empty($default)) {
+        @each $item-n, $content in $items-n { @include selector("&.#{$item-n}") {
+            @include style-of($item-n);   // import item-specific style
+        }}
+    }
+    @else {
+        @include selector-combine("", img.$class) {
+            @include img.style-any;
+        }
+    
+        @include selector-combine("", font.$class) {
+            @include font.style-any;
+        }
+    }
+}
+#{$alias}- {
+    @if (str-not-empty($default)) {
+        @each $item-n, $content in $items-n { @include selector("&.#{$item-n}") {
+            @extend #{$alias}-#{$item-n} !optional; // import item-specific style
+        }}
+    }
+    @else {
+        @include selector-combine("", img.$class) {
+            @extend #{img.$alias}- !optional;
+        }
+    
+        @include selector-combine("", font.$class) {
+            @extend #{font.$alias}- !optional;
+        }
+    }
+}
+/* end: item-any (-) style */
 
 
 
@@ -24,46 +182,34 @@ $alias          : "%icon"                                   !default;
 @mixin style-basic {
     @include base.style;
 
-    @include selector-combine("", font.$class) {
-        @include font.style-basic;
-    }
-
-    @include selector-combine("", img.$class) {
+    @if ($default != "img") { @include selector-combine("", img.$class) {
         @include img.style-basic;
-    }
+    }}
+
+    @if ($default != "font") { @include selector-combine("", font.$class) {
+        @include font.style-basic;
+    }}
 }
 #{$alias}-- {
     @extend #{base.$alias} !optional;
 
-    @include selector-combine("", font.$class) {
-        @extend #{font.$alias}-- !optional;
-    }
-
-    @include selector-combine("", img.$class) {
+    @if ($default != "img") { @include selector-combine("", img.$class) {
         @extend #{img.$alias}-- !optional;
-    }
+    }}
+
+    @if ($default != "font") { @include selector-combine("", font.$class) {
+        @extend #{font.$alias}-- !optional;
+    }}
 }
 /* end: basic (--) style */
 
 @mixin style() {
-    @include base.style;
+    @include style-basic;   // import basic (--) style
 
-    @include selector-combine("", font.$class) {
-        @include font.style;
-    }
-
-    @include selector-combine("", img.$class) {
-        @include img.style;
-    }
+    @include style-any;     // import item-any (-) style
 }
 #{$alias} {
-    @extend #{base.$alias} !optional;
+    @extend #{$alias}-- !optional;    // import basic (--) style
 
-    @include selector-combine("", font.$class) {
-        @extend #{font.$alias} !optional;
-    }
-
-    @include selector-combine("", img.$class) {
-        @extend #{img.$alias} !optional;
-    }
+    @extend #{$alias}- !optional;     // import item-any (-) style
 }

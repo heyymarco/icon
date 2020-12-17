@@ -23,7 +23,7 @@ $cssvar: cssvar($var-prefix);
 // production:
 $path           : "./node_modules/@heymarco/icon/icons/"    !default;
 
-$files          : (
+$items          : (
  /* filename    | ratio */
     document    : 1.00,
     form        : 1.00,
@@ -32,6 +32,12 @@ $files          : (
 )                                                           !default;
 $ext            : svg                                       !default;
 $ratio-default  : 1                                         !default;
+
+$items-n: ();
+@each $item, $ratio in $items {
+    $item-n: normalize-class($item);
+    $items-n: map.merge($items-n, ($item-n: $ratio));
+}
 
 
 
@@ -46,29 +52,30 @@ $ratio-default  : 1                                         !default;
 
 
 /* begin: item-specific (-specific) style */
-@mixin style-of($file) {
-    @if (not map.has-key($files, $file)) { @error "#{$file} is not found."; }
+@mixin style-of($item) {
+    $item-n: normalize-class($item);
+    @if (not map.has-key($items-n, $item-n)) { @error "#{$item} is not found."; }
     
-    #{string.slice($cssvar, 1, -2)} : url("#{$path}#{$file}.#{$ext}");
+    #{string.slice($cssvar, 1, -2)} : url("#{$path}#{$item}.#{$ext}");
 
-    $ratio: map.get($files, $file);
+    $ratio: map.get($items-n, $item-n);
     @if (($ratio < $ratio-default) or ($ratio > $ratio-default)) { #{$cssvar}ratio: $ratio; }
 }
-@each $file, $ratio in $files {
-    #{$alias}-#{$file}  { @include style-of($file); }
+@each $item-n, $ratio in $items-n {
+    #{$alias}-#{$item-n}  { @include style-of($item-n); }
 }
 /* end: item-specific (-specific) style */
 
 
 /* begin: item-any (-) style */
 @mixin style-any {
-    @each $file, $ratio in $files { @include selector("&.#{$file}") {
-        @include style-of($file);   // import item-specific style
+    @each $item-n, $ratio in $items-n { @include selector("&.#{$item-n}") {
+        @include style-of($item-n);   // import item-specific style
     }}
 }
 #{$alias}- {
-    @each $file, $ratio in $files { @include selector("&.#{$file}") {
-        @extend #{$alias}-#{$file}; // import item-specific style
+    @each $item-n, $ratio in $items-n { @include selector("&.#{$item-n}") {
+        @extend #{$alias}-#{$item-n}; // import item-specific style
     }}
 }
 /* end: item-any (-) style */

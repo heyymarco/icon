@@ -12,7 +12,7 @@
 
 
 $alias          : "%icon-font"                              !default;
-/*sub*/$class   : ""                                        !default;
+/*sub*/$class   : ".font"                                   !default;
 $var-root       : base.$var-root                            !default;
 $var-prefix     : "font"                                    !default;
 $var-prefix: part-combine(base.$var-prefix, $var-prefix);
@@ -33,11 +33,18 @@ $family         : "Material Icons"                          !default;
 $style          : normal                                    !default;
 $weight         : 400                                       !default;
 
-$contents     : material.$contents                          !default;
+$items          : material.$contents                        !default;
+
+$items-n: ();
+@each $item, $content in $items {
+    $item-n: normalize-class($item);
+    $items-n: map.merge($items-n, ($item-n: $content));
+}
 
 
 
 @function format($file) {
+    // TODO: should better string.last-index
     $dot: string.index($file, ".");
     @if ($dot == null) { @return ""; }
 
@@ -79,33 +86,28 @@ $contents     : material.$contents                          !default;
 
 
 /* begin: item-specific (-specific) style */
-@mixin style-of($name) {
-    @if (not map.has-key($contents, $name)) { @error "#{$name} is not found."; }
+@mixin style-of($item) {
+    $item-n: normalize-class($item);
+    @if (not map.has-key($items-n, $item-n)) { @error "#{$item} is not found."; }
     
-    $content: map.get($contents, $name);
+    $content: map.get($items-n, $item-n);
     #{$cssvar}content   : $content;
 }
-@each $name, $content in $contents {
-    #{$alias}-#{$name}  { @include style-of($name); }
+@each $item-n, $content in $items-n {
+    #{$alias}-#{$item-n}  { @include style-of($item-n); }
 }
 /* end: item-specific (-specific) style */
 
 
 /* begin: item-any (-) style */
-@function normalize-class($name) {
-    $first-char: string.slice($name, 0, 1);
-    @if (string.index("0123456789", $first-char)) { $name: "_" + $name; }
-
-    @return $name;
-}
 @mixin style-any {
-    @each $name, $content in $contents { @include selector("&.#{normalize-class($name)}") {
-        @include style-of($name);   // import item-specific style
+    @each $item-n, $content in $items-n { @include selector("&.#{$item-n}") {
+        @include style-of($item-n);   // import item-specific style
     }}
 }
 #{$alias}- {
-    @each $name, $content in $contents { @include selector("&.#{normalize-class($name)}") {
-        @extend #{$alias}-#{$name}; // import item-specific style
+    @each $item-n, $content in $items-n { @include selector("&.#{$item-n}") {
+        @extend #{$alias}-#{$item-n}; // import item-specific style
     }}
 }
 /* end: item-any (-) style */
