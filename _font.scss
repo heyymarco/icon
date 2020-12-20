@@ -2,21 +2,32 @@
 
 
 
-@use "dependencies" as *;
-@use "sass:string" as string;
-@use "sass:map" as map;
+// development:
+// @use "node_modules/@heymarco/sass-class-template/index" as *;
+// @use "node_modules/@heymarco/sass-selector/index" as selector;
 
-@use "base" as base;
-@use "font-material-codepoints" as material;
+// production:
+@use "../../../node_modules/@heymarco/sass-class-template/index" as *;
+@use "../../../node_modules/@heymarco/sass-selector/index" as selector;
 
 
 
-$alias          : "%icon-font"                              !default;
-/*sub*/$class   : ".font"                                   !default;
-$var-root       : base.$var-root                            !default;
-$var-prefix     : "font"                                    !default;
-$var-prefix: part-combine(base.$var-prefix, $var-prefix);
-$cssvar: cssvar($var-prefix);
+@use    "base"         as base;
+@use    "font-material-codepoints"  as material;
+
+
+@use    "common"       as *;
+@use    "sass:string"  as string;
+@use    "sass:map"     as map;
+
+
+
+$alias              : "%icon-font"                          !default;
+/*sub*/$class       : ".font"                               !default;
+$var-root           : base.$var-root                        !default;
+$var-prefix         : "font"                                !default;
+$var-prefix-base    : base.$var-prefix                      !default;
+$cssvar: make-cssvar($var-prefix, $var-prefix-base);
 
 // development:
 // $path           : "./fonts/"                                !default;
@@ -57,7 +68,7 @@ $items-n: ();
 @function src() {
     $list: "";
     @each $file in $files {
-        $list: $list + "url(\"#{$path}#{$file}\") format(\"#{format($file)}\"), "
+        $list: $list + "url(\"#{$path}#{$file}\") format(\"#{format($file)}\"), ";
     }
 
     // replace the last " ,"
@@ -77,47 +88,59 @@ $items-n: ();
     src             : src();
 }
 
-@if (str-not-empty($var-root)) { @include selector($var-root) {
-    /* #{$alias} var */
-
+@include declare-cssvar($var-root) {
     #{$cssvar}content   : "";
-}}
+}
 
 
 
 /* begin: item-specific (-specific) style */
-@mixin style-of($item) {
+@mixin _style-of($item) {
     $item-n: normalize-class($item);
     @if (not map.has-key($items-n, $item-n)) { @error "#{$item} is not found."; }
     
     $content: map.get($items-n, $item-n);
     #{$cssvar}content   : $content;
 }
+@mixin style-of($item) {
+    @include _style-of($item);
+
+    //items => implicitly included from style basic: @include style-basic;
+}
 @each $item-n, $content in $items-n {
-    #{$alias}-#{$item-n}  { @include style-of($item-n); }
+    @include alias-of($alias, $item-n) {
+        @include _style-of($item-n);
+
+        //items => implicitly included from style basic: @extend #{$alias}--;
+    }
 }
 /* end: item-specific (-specific) style */
 
-
 /* begin: item-any (-) style */
-@mixin style-any {
-    @each $item-n, $content in $items-n { @include selector("&.#{$item-n}") {
-        @include style-of($item-n);   // import item-specific style
-    }}
+@mixin _style-any($include) {
+    @each $item-n, $content in $items-n {
+        @include selector.append("." + $item-n) {
+            @if ($include) {
+                @include style-of($item-n);   // import item-specific style
+            }
+            @else {
+                @extend #{$alias}-#{$item-n} !optional; // import item-specific style
+            }
+        }
+    }
 }
-#{$alias}- {
-    @each $item-n, $content in $items-n { @include selector("&.#{$item-n}") {
-        @extend #{$alias}-#{$item-n}; // import item-specific style
-    }}
+@mixin style-any {
+    @include _style-any(true);
+}
+@include alias-any($alias) {
+    @include _style-any(false);
 }
 /* end: item-any (-) style */
 
 
 
 /* begin: basic (--) style */
-@mixin style-basic {
-    /* icon-font */
-
+@mixin _style-basic {
     font-size       : var(#{base.$cssvar}size);
 
     color           : var(#{base.$cssvar}color);
@@ -146,16 +169,32 @@ $items-n: ();
     // support for IE
     font-feature-settings: 'liga';
 }
-#{$alias}-- { @include style-basic; }
+@mixin style-basic {
+    //sub-class => implicitly included from base: @include base.style;
+
+    @include _style-basic;
+}
+@include alias-basic($alias) {
+    //sub-class => implicitly included from base: @extend #{base.$alias} !optional;
+
+    @include _style-basic;
+}
 /* end: basic (--) style */
 
+
+
+/* begin: general style */
 @mixin style {
     @include style-basic;   // import basic (--) style
-
     @include style-any;     // import item-any (-) style
 }
-@include declare-alias-base-class($alias, base.$class, $class) {
-    @extend #{$alias}--;    // import basic (--) style
-
-    @extend #{$alias}-;     // import item-any (-) style
+@include alias($alias) {
+    @extend #{$alias}-- !optional; // import basic (--) style
+    @extend #{$alias}-  !optional; // import item-any (-) style
 }
+/* end: general style */
+
+
+
+// abstract class => no emit class
+// @include class($alias, $class, base.$class);

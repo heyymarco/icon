@@ -1,0 +1,10 @@
+@use "sass:string" as string;
+
+
+
+@function normalize-class($name) {
+    $first-char: string.slice($name, 0, 1);
+    @if (string.index("0123456789", $first-char) != null) { $name: "_" + $name; }
+
+    @return $name;
+}

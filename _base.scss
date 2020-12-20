@@ -1,0 +1,58 @@
+// Provides a base icon set for html page.
+
+
+
+// development:
+// @use "node_modules/@heymarco/sass-class-template/index" as *;
+
+// production:
+@use "../../../node_modules/@heymarco/sass-class-template/index" as *;
+
+
+
+$alias              : "%icon-base"                          !default;
+$class              : "span.icon"                           !default;
+$var-root           : ":root"                               !default;
+$var-prefix         : "icon"                                !default;
+$var-prefix-base    : ""                                    !default;
+$cssvar: make-cssvar($var-prefix, $var-prefix-base);
+
+$display            : inline-block                          !default;
+$vertical-align     : middle                                !default;
+
+$color              : currentColor                          !default;
+
+$size               : var(#{$cssvar}size-normal)            !default;
+$size-small         : 18px                                  !default;
+$size-normal        : 24px                                  !default;
+$size-medium        : 36px                                  !default;
+$size-large         : 48px                                  !default;
+
+
+
+@include declare-cssvar($var-root) {
+    #{$cssvar}color             : #{$color};
+
+    #{$cssvar}size              : #{$size};
+    #{$cssvar}size-small        : #{$size-small};
+    #{$cssvar}size-normal       : #{$size-normal};
+    #{$cssvar}size-medium       : #{$size-medium};
+    #{$cssvar}size-large        : #{$size-large};
+}
+
+
+
+/* begin: general style */
+@mixin style {
+    display                     : $display;
+    vertical-align              : $vertical-align;
+}
+@include alias($alias) {
+    @include style;
+}
+/* end: general style */
+
+
+
+// abstract class => no emit class
+// @include class($alias, $class, "");
