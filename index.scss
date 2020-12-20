@@ -25,8 +25,8 @@
 @use     "font"       as font;
 
 
-@use     "common"     as *;
 @forward "common";
+@use     "common"     as *;
 @use     "sass:list"  as list;
 @use     "sass:map"   as map;
 
