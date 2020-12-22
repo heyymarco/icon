@@ -83,6 +83,11 @@ $items-n: ();
     }
 }
 @mixin _style-of($item, $include) {
+    //items => implicitly included from style basic:
+    // @if ($include) { @include style-basic; }
+    // @else          { @extend #{$alias}--; }
+
+
     $item-n: normalize-class($item);
 
     $img-has-item   : map.has-key(img.$items-n, $item-n);
@@ -139,14 +144,10 @@ $items-n: ();
 }
 @mixin style-of($item) {
     @include _style-of($item, true);
-
-    //items => implicitly included from style basic: @include style-basic;
 }
 @each $item-n, $content in $items-n {
     @include alias-of($alias, $item-n) {
         @include _style-of($item-n, false);
-
-        //items => implicitly included from style basic: @extend #{$alias}--;
     }
 }
 /* end: item-specific (-specific) style */
@@ -156,32 +157,23 @@ $items-n: ();
     @if (string.not-empty($default)) {
         @each $item-n, $content in $items-n {
             @include selector.append("." + $item-n) {
-                @if ($include) {
-                    @include style-of($item-n);   // import item-specific style
-                }
-                @else {
-                    @extend #{$alias}-#{$item-n} !optional; // import item-specific style
-                }
+                // import item-specific style:
+                @if ($include) { @include   style-of($item-n); }
+                @else          { @extend #{$alias}-#{$item-n} !optional; }
             }
         }
     }
     @else {
         @include selector.append(img.$class) {
-            @if ($include) {
-                @include img.style-any;
-            }
-            @else {
-                @extend #{img.$alias}- !optional;
-            }
+            // import item-specific style:
+            @if ($include) { @include  img.style-any; }
+            @else          { @extend #{img.$alias}- !optional; }
         }
     
         @include selector.append(font.$class) {
-            @if ($include) {
-                @include font.style-any;
-            }
-            @else {
-                @extend #{font.$alias}- !optional;
-            }
+            // import item-specific style:
+            @if ($include) { @include  font.style-any; }
+            @else          { @extend #{font.$alias}- !optional; }
         }
     }
 }
@@ -197,6 +189,10 @@ $items-n: ();
 
 /* begin: basic (--) style */
 @mixin _style-basic($include) {
+    @if ($include) { @include  base.style; }
+    @else          { @extend #{base.$alias} !optional; }
+
+
     @if (string.is-empty($default)) {
         @include selector.append(img.$class) {
             @if ($include) {
@@ -218,13 +214,9 @@ $items-n: ();
     }
 }
 @mixin style-basic {
-    @include base.style;
-
     @include _style-basic(true);
 }
 @include alias-basic($alias) {
-    @extend #{base.$alias} !optional;
-
     @include _style-basic(false);
 }
 /* end: basic (--) style */
