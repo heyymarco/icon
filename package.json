@@ -1,6 +1,6 @@
 {
   "name": "@heymarco/icon",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Provides a common icon set for html page using \"image based icon\" and fallback using \"font based icon\" (Google's Material Icons -or- Font Awesome).",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/heyymarco/icon#readme",
   "dependencies": {
-    "@heymarco/sass-class-template": "^1.0.5",
+    "@heymarco/sass-class-template": "^1.0.6",
     "@heymarco/sass-string": "^1.0.1"
   }
 }
