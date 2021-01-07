@@ -37,6 +37,11 @@ $alias          : "%icon"                                   !default;
 $default        : "img"                                     !default;
 @if (list.index(("img", "font", "", null), $default) == null) { @error "$default must be \"img\" or \"font\" or \"\" or null"; }
 
+// limits the extend.
+// in some browsers, too many extends => css is not recognized well
+// so we limit the extend number - creates a new style group
+$extend-limit   : 300                                       !default;
+
 
 
 /* begin: item-specific (-specific) style */
@@ -54,6 +59,9 @@ $items-n: ();
     }
 }
 
+$_extend-current-img: #{img.$alias}--;
+$_extend-counter-img: 0;
+$_extend-counter-group-img: 1;
 @mixin _style-of-img($item-n, $include) {
     @if ($include) {
         @include img.style-of($item-n);
@@ -65,9 +73,24 @@ $items-n: ();
         @extend #{img.$alias}-#{$item-n} !optional;
 
         // explicitly include to:
-        @extend #{img.$alias}--          !optional;
+        @if ($extend-limit >= 1) {
+            $_extend-counter-img: $_extend-counter-img + 1;
+            @if ($_extend-counter-img > $extend-limit) {
+                $_extend-counter-img: 0;
+                $_extend-counter-group-img: $_extend-counter-group-img + 1;
+
+                $_extend-current-img: #{img.$alias}--#{$_extend-counter-group-img};
+                @at-root { @include selector.is($_extend-current-img) {
+                    @include img.style-basic;
+                }}
+            }
+        }
+        @extend #{$_extend-current-img}  !optional;
     }
 }
+$_extend-current-font: #{font.$alias}--;
+$_extend-counter-font: 0;
+$_extend-counter-group-font: 1;
 @mixin _style-of-font($item-n, $include) {
     @if ($include) {
         @include font.style-of($item-n);
@@ -79,7 +102,19 @@ $items-n: ();
         @extend #{font.$alias}-#{$item-n} !optional;
 
         // explicitly include to:
-        @extend #{font.$alias}--          !optional;
+        @if ($extend-limit >= 1) {
+            $_extend-counter-font: $_extend-counter-font + 1;
+            @if ($_extend-counter-font > $extend-limit) {
+                $_extend-counter-font: 0;
+                $_extend-counter-group-font: $_extend-counter-group-font + 1;
+
+                $_extend-current-font: #{font.$alias}--#{$_extend-counter-group-font};
+                @at-root { @include selector.is($_extend-current-font) {
+                    @include font.style-basic;
+                }}
+            }
+        }
+        @extend #{$_extend-current-font}  !optional;
     }
 }
 @mixin _style-of($item, $include) {
