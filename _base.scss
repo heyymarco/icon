@@ -4,9 +4,11 @@
 
 // development:
 // @use "node_modules/@heymarco/sass-class-template/index" as *;
+// @use "node_modules/@heymarco/sass-selector/index"       as selector;
 
 // production:
 @use "../../../node_modules/@heymarco/sass-class-template/index" as *;
+@use "../../../node_modules/@heymarco/sass-selector/index"       as selector;
 
 
 
@@ -22,11 +24,12 @@ $vertical-align     : middle                                !default;
 
 $color              : currentColor                          !default;
 
-$size               : var(#{$cssvar}size-normal)            !default;
-$size-small         : 18px                                  !default;
-$size-normal        : 24px                                  !default;
-$size-medium        : 36px                                  !default;
-$size-large         : 48px                                  !default;
+$size               : var(#{$cssvar}size-default)           !default;
+$size-default       : var(#{$cssvar}size-nm)                !default;
+$size-sm            : 18px                                  !default;
+$size-nm            : 24px                                  !default;
+$size-md            : 36px                                  !default;
+$size-lg            : 48px                                  !default;
 
 
 
@@ -34,10 +37,11 @@ $size-large         : 48px                                  !default;
     #{$cssvar}color             : #{$color};
 
     #{$cssvar}size              : #{$size};
-    #{$cssvar}size-small        : #{$size-small};
-    #{$cssvar}size-normal       : #{$size-normal};
-    #{$cssvar}size-medium       : #{$size-medium};
-    #{$cssvar}size-large        : #{$size-large};
+    #{$cssvar}size-default      : #{$size-default};
+    #{$cssvar}size-sm           : #{$size-sm};
+    #{$cssvar}size-nm           : #{$size-nm};
+    #{$cssvar}size-md           : #{$size-md};
+    #{$cssvar}size-lg           : #{$size-lg};
 }
 
 
@@ -46,6 +50,13 @@ $size-large         : 48px                                  !default;
 @mixin _style($include) {
     display                     : $display;
     vertical-align              : $vertical-align;
+
+
+    /* begin: variant-size */
+    @each $size in (sm, nm, md, lg) { @include selector.append("." + $size) {
+        #{$cssvar}size: var(#{$cssvar}size-#{$size});
+    }}
+    /* end: variant-size */
 }
 @mixin style {
     @include _style(true);

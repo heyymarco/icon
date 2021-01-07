@@ -1,10 +1,54 @@
+// development:
+// @use "node_modules/@heymarco/colors/index"              as color;
+
+// production:
+@use "../../../node_modules/@heymarco/colors/index"              as color;
+
+
+
+@use "base"        as base;
 @use "sass:string" as string;
+@use "sass:list"   as list;
 
 
+
+$_reserved-classes: (
+    // size variants:
+    xs, sm, nm, md, lg, xl, xxl, xxxl,
+
+    // states:
+    leave,
+    blur,
+    disabled, enabled,
+    active, actived,
+    passive,
+
+    //typography:
+    text-second,
+    h1, h2, h3, h4, h5, h6,
+    display-1, display-2, display-3, display-4, display-5, display-6,
+    p,
+    lead,
+    blockquote,
+    mark, code, kbd, var, samp,
+    small,
+
+    // controls:
+    icon, img, font,
+    btn,
+    masonry,
+    modal,
+    navbar
+);
+@each $theme-name, $theme-value in color.$themes {
+    $_reserved-classes: list.append($_reserved-classes, $theme-name);
+}
 
 @function normalize-class($name) {
     $first-char: string.slice($name, 0, 1);
-    @if (string.index("0123456789", $first-char) != null) { $name: "_" + $name; }
+    @if (string.index("0123456789", $first-char) != null) { @return "_" + $name; }
+
+    @if (list.index($_reserved-classes, $name) != null) { @return "#{base.$var-prefix}-#{$name}"; }
 
     @return $name;
 }
