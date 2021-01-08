@@ -41,8 +41,9 @@ $files          : (
     "MaterialIcons-Regular.ttf",
 )                                                           !default;
 $family         : "Material Icons"                          !default;
-$style          : normal                                    !default;
 $weight         : 400                                       !default;
+$style          : normal                                    !default;
+$text-decoration: none                                      !default;
 
 $items          : material.$contents                        !default;
 
@@ -83,8 +84,10 @@ $items-n: ();
     /* icon-font */
 
     font-family     : $family;
-    font-style      : $style;
     font-weight     : $weight;
+    font-style      : $style;
+    text-decoration : $text-decoration;
+    
     src             : src();
 }
 
@@ -144,14 +147,17 @@ $items-n: ();
     // @else          { @extend #{base.$alias} !optional; }
 
 
+    height          : var(#{base.$cssvar}size);
     font-size       : var(#{base.$cssvar}size);
+    overflow-y      : hidden;
 
     color           : var(#{base.$cssvar}color);
 
 
     font-family     : $family;
-    font-style      : $style;
     font-weight     : $weight;
+    font-style      : $style;
+    text-decoration : $text-decoration;
 
     line-height     : 1;
     text-transform  : none;
