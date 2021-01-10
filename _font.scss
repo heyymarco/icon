@@ -23,7 +23,7 @@
 
 
 $alias              : "%icon-font"                          !default;
-/*sub*/$class       : ".font"                               !default;
+/*sub*/$class       : ""                                    !default;
 $var-root           : base.$var-root                        !default;
 $var-prefix         : "font"                                !default;
 $var-prefix-base    : base.$var-prefix                      !default;

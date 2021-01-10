@@ -25,8 +25,7 @@
 @use     "font"       as font;
 
 
-@forward "common";
-@use     "common"     as *;
+@use     "common"     as comm;
 @use     "sass:list"  as list;
 @use     "sass:map"   as map;
 
@@ -45,6 +44,7 @@ $extend-limit   : 300                                       !default;
 
 
 /* begin: item-specific (-specific) style */
+@function normalize-class($name) { @return comm.normalize-class($name); }
 $items-n: ();
 @if (string.not-empty($default)) {
     @if ($default == "img") {
@@ -67,25 +67,29 @@ $_extend-counter-group-img: 1;
         @include img.style-of($item-n);
 
         // explicitly include to:
-        @include img.style-basic;
+        @if (string.not-empty(img.$class)) {
+            @include img.style-basic;
+        }
     }
     @else {
         @extend #{img.$alias}-#{$item-n} !optional;
 
         // explicitly include to:
-        @if ($extend-limit >= 1) {
-            $_extend-counter-img: $_extend-counter-img + 1;
-            @if ($_extend-counter-img > $extend-limit) {
-                $_extend-counter-img: 0;
-                $_extend-counter-group-img: $_extend-counter-group-img + 1;
+        @if (string.not-empty(img.$class)) {
+            @if ($extend-limit >= 1) {
+                $_extend-counter-img: $_extend-counter-img + 1;
+                @if ($_extend-counter-img > $extend-limit) {
+                    $_extend-counter-img: 0;
+                    $_extend-counter-group-img: $_extend-counter-group-img + 1;
 
-                $_extend-current-img: #{img.$alias}--#{$_extend-counter-group-img};
-                @at-root { @include selector.is($_extend-current-img) {
-                    @include img.style-basic;
-                }}
+                    $_extend-current-img: #{img.$alias}--#{$_extend-counter-group-img};
+                    @at-root { @include selector.is($_extend-current-img) {
+                        @include img.style-basic;
+                    }}
+                }
             }
+            @extend #{$_extend-current-img}  !optional;
         }
-        @extend #{$_extend-current-img}  !optional;
     }
 }
 $_extend-current-font: #{font.$alias}--;
@@ -96,25 +100,29 @@ $_extend-counter-group-font: 1;
         @include font.style-of($item-n);
 
         // explicitly include to:
-        @include font.style-basic;
+        @if (string.not-empty(font.$class)) {
+            @include font.style-basic;
+        }
     }
     @else {
         @extend #{font.$alias}-#{$item-n} !optional;
 
         // explicitly include to:
-        @if ($extend-limit >= 1) {
-            $_extend-counter-font: $_extend-counter-font + 1;
-            @if ($_extend-counter-font > $extend-limit) {
-                $_extend-counter-font: 0;
-                $_extend-counter-group-font: $_extend-counter-group-font + 1;
-
-                $_extend-current-font: #{font.$alias}--#{$_extend-counter-group-font};
-                @at-root { @include selector.is($_extend-current-font) {
-                    @include font.style-basic;
-                }}
+        @if (string.not-empty(font.$class)) {
+            @if ($extend-limit >= 1) {
+                $_extend-counter-font: $_extend-counter-font + 1;
+                @if ($_extend-counter-font > $extend-limit) {
+                    $_extend-counter-font: 0;
+                    $_extend-counter-group-font: $_extend-counter-group-font + 1;
+    
+                    $_extend-current-font: #{font.$alias}--#{$_extend-counter-group-font};
+                    @at-root { @include selector.is($_extend-current-font) {
+                        @include font.style-basic;
+                    }}
+                }
             }
+            @extend #{$_extend-current-font}  !optional;
         }
-        @extend #{$_extend-current-font}  !optional;
     }
 }
 @mixin _style-of($item, $include) {
@@ -228,23 +236,17 @@ $_extend-counter-group-font: 1;
     @else          { @extend #{base.$alias} !optional; }
 
 
-    @if (string.is-empty($default)) {
+    @if (string.is-empty($default) or string.is-empty(img.$class)) {
         @include selector.append(img.$class) {
-            @if ($include) {
-                @include img.style-basic;
-            }
-            @else {
-                @extend #{img.$alias}-- !optional;
-            }
+            @if ($include) { @include img.style-basic; }
+            @else          { @extend #{img.$alias}-- !optional; }
         }
+    }
 
+    @if (string.is-empty($default) or string.is-empty(font.$class)) {
         @include selector.append(font.$class) {
-            @if ($include) {
-                @include font.style-basic;
-            }
-            @else {
-                @extend #{font.$alias}-- !optional;
-            }
+            @if ($include) { @include font.style-basic; }
+            @else          { @extend #{font.$alias}-- !optional; }
         }
     }
 }

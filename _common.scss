@@ -46,9 +46,8 @@ $_reserved-classes: (
 
 @function normalize-class($name) {
     $first-char: string.slice($name, 0, 1);
-    @if (string.index("0123456789", $first-char) != null) { @return "_" + $name; }
 
-    @if (list.index($_reserved-classes, $name) != null) { @return "#{base.$var-prefix}-#{$name}"; }
+    @if ((string.index("0123456789", $first-char) != null) or (list.index($_reserved-classes, $name) != null)) { @return "#{base.$var-prefix}-#{$name}"; }
 
     @return $name;
 }
